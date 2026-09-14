@@ -16,6 +16,15 @@ startButton.addEventListener("click", async () =>{
 		const blob = new Blob(audioChunks, {type: "audio/webm; codecs=opus"});
 		const audioURL = window.URL.createObjectURL(blob);
 		audioPlayback.src = audioURL;
+		const formData = new FormData();
+		formData.append("audio", blob);
+		
+		fetch("/api/v1/transcribe", {method: "POST", body: formData})
+			.then(response => response.text())
+			.then(text => console.log(text))
+			
+		
+		
 				
 	})
 
