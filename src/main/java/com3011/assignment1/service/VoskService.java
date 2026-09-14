@@ -13,6 +13,19 @@ public class VoskService {
 
 	public VoskService() throws IOException  {
 		model = new Model("models/vosk-model-small-en-us-0.15");
-		
 	}
+	
+	public String transcribe(byte[] audioBytes) {
+		Recognizer recognizer = new Recognizer(model, 16000);
+		
+		recognizer.acceptWaveForm(audioBytes, audioBytes.length);
+		
+		String finalResult = recognizer.getFinalResult();
+		String partialResult = recognizer.getPartialResult();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		
+		return "";
+	}
+	
 }
