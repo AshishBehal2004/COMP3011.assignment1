@@ -22,9 +22,6 @@ startButton.addEventListener("click", async () =>{
 		fetch("/api/v1/transcribe", {method: "POST", body: formData})
 			.then(response => response.text())
 			.then(text => console.log(text))
-			
-		
-		
 				
 	})
 
