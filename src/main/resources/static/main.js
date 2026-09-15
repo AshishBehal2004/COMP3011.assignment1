@@ -31,3 +31,19 @@ startButton.addEventListener("click", async () =>{
 		sourceNode.disconnect();
 		stream.getTracks().forEach(track => track.stop());
 })
+
+function mergeChunks(chunks){
+	let totalLength = 0;
+	for(const chunk of chunks){
+		totalLength += chunk.length;
+	}
+	
+	const result = new Float32Array(totalLength);
+	let offset = 0;
+	
+	for(const chunk of chunks){
+		result.set(chunk, offset);
+		offset += chunk.length;
+	}
+	return result;
+}
