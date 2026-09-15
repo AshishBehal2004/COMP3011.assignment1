@@ -1,11 +1,13 @@
 package com3011.assignment1.service;
 
-import java.io.File;
+
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -22,30 +24,13 @@ import tools.jackson.databind.ObjectMapper;
 public class VoskService {
 	
 	private final Model model; 
-	private final String ffmpeg;
 	
-	public VoskService(@Value("${vosk.model.path}") String modelPath, @Value("${ffmpeg.binary.path}") String ffmpegPath ) throws IOException  {
+	public VoskService(@Value("${vosk.model.path}") String modelPath ) throws IOException  {
 		String extractedPath = extractModelToTemp(modelPath);
 		model = new Model(extractedPath);
-		this.ffmpeg = extractFFmPegToTemp(ffmpegPath);
+		
 	}
 	
-	private String extractFFmPegToTemp(String ffmpegResourcePath) throws IOException {
-		
-		Path tempDir = Files.createTempDirectory("ffmpeg");
-		
-		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-		Resource resource = resolver.getResource("classpath:" + ffmpegResourcePath);
-		Path targetPath = tempDir.resolve("ffmpeg");
-		
-		if(resource.isReadable() && resource.contentLength() > 0) {
-						
-			try(InputStream in = resource.getInputStream()) {
-				Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
-			}
-		}
-	}
-
 	private String extractModelToTemp(String resourcePath) throws IOException{
 		
 		Path tempDir = Files.createTempDirectory("vosk-model");
@@ -73,22 +58,12 @@ public class VoskService {
 //		return null;
 	}
 
-	public String transcribe(byte[] audioBytes) throws IOException, InterruptedException  {
-		
-		File tempInput = File.createTempFile("audio", ".webm");
-		Files.write(tempInput.toPath(), audioBytes);
-		File tempOutput = File.createTempFile("audio",".wav");
-		
-		ProcessBuilder processBuilder = new ProcessBuilder("ffmpeg", "-y", "-i", tempInput.getAbsolutePath(), "-ar", "16000", "-ac", "1", tempOutput.getAbsolutePath()); //conversion step
-		
-		processBuilder.inheritIO();
-		
-		Process process = processBuilder.start(); // begin converting
+	public String transcribe(byte[] audioBytes) throws IOException  {
 		
 		
-		process.waitFor(); // wait till the conversion finishes
+
 		
-		byte[] convertedBytes = Files.readAllBytes(tempOutput.toPath()); //read the file bytes into memory, so it can be used
+		byte[] convertedBytes = java.util.Arrays.copyOfRange(audioBytes, 44, audioBytes.length);
 		
 		Recognizer recognizer = new Recognizer(model, 16000);
 		
