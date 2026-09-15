@@ -22,12 +22,30 @@ import tools.jackson.databind.ObjectMapper;
 public class VoskService {
 	
 	private final Model model; 
-
-	public VoskService(@Value("${vosk.model.path}") String modelPath) throws IOException  {
+	private final String ffmpeg;
+	
+	public VoskService(@Value("${vosk.model.path}") String modelPath, @Value("${ffmpeg.binary.path}") String ffmpegPath ) throws IOException  {
 		String extractedPath = extractModelToTemp(modelPath);
 		model = new Model(extractedPath);
+		this.ffmpeg = extractFFmPegToTemp(ffmpegPath);
 	}
 	
+	private String extractFFmPegToTemp(String ffmpegResourcePath) throws IOException {
+		
+		Path tempDir = Files.createTempDirectory("ffmpeg");
+		
+		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+		Resource resource = resolver.getResource("classpath:" + ffmpegResourcePath);
+		Path targetPath = tempDir.resolve("ffmpeg");
+		
+		if(resource.isReadable() && resource.contentLength() > 0) {
+						
+			try(InputStream in = resource.getInputStream()) {
+				Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
+			}
+		}
+	}
+
 	private String extractModelToTemp(String resourcePath) throws IOException{
 		
 		Path tempDir = Files.createTempDirectory("vosk-model");
@@ -37,8 +55,7 @@ public class VoskService {
 		System.out.println("Found resources: " + resources.length);
 		
 		for(Resource resource: resources) {
-			// Debug
-//			System.out.println("Resource: " + resource.getFilename() + " readable=" + resource.isReadable() + " length=" + resource.contentLength());
+			
 			if(resource.isReadable() && resource.contentLength() > 0) {
 				String url = resource.getURL().toString();
 				String relativePath = url.substring(url.indexOf(resourcePath)+ resourcePath.length());
@@ -50,9 +67,6 @@ public class VoskService {
 				try(InputStream in = resource.getInputStream()){
 					Files.copy(in, targetPath, StandardCopyOption.REPLACE_EXISTING);
 				}
-				
-//				System.out.println("Copied to: " + targetPath + " exists=" + Files.exists(targetPath));
-			    
 			}
 		}
 		return tempDir.toString();
