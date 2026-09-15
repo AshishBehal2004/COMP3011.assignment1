@@ -47,3 +47,14 @@ function mergeChunks(chunks){
 	}
 	return result;
 }
+
+function downSampleTo16k(samples, inputRate, outputRate){
+	const ratio = inputRate / outputRate;
+	const newLength = Math.round(samples.length / ratio);
+	const result = new Float32Array(newLength);
+	
+	for(let i= 0 ; i < newLength; i++){
+		result[i] = samples[Math.round(i*ratio)];
+	}
+	return result;
+}
