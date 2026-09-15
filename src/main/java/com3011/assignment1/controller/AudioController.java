@@ -17,7 +17,6 @@ public class AudioController {
 	public String transcribe(@RequestParam("audio") MultipartFile audioFile) throws IOException {
 		String transcribedText = voskService.transcribe(audioFile.getBytes());
 		
-		
 		return transcribedText;
 	}
 	

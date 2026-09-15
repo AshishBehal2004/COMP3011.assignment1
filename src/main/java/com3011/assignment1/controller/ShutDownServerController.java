@@ -11,7 +11,7 @@ import com3011.assignment1.model.ShutDownServerResponse;
 public class ShutDownServerController {
 	
 	@PostMapping("/shutdown")
-	public ShutDownServerResponse getTime() {
+	public ShutDownServerResponse shutDown() {
 		return new ShutDownServerResponse("Server shutting down...") ;
 	}
 }
