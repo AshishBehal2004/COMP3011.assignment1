@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.vosk.Model;
 import org.vosk.Recognizer;
@@ -28,8 +30,17 @@ public class VoskService {
 		
 		Path tempDir = Files.createTempDirectory("vosk-model");
 		
+		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+		Resource[] resources = resolver.getResources("classpath:"+resourcePath+"/**");
 		
-//		Resource[] resources = resolver.
+		for(Resource resource: resources) {
+			if(resource.isReadable() && resource.contentLength() > 0) {
+				String url = resource.getURL().toString();
+				String relativePath = url.substring(url.indexOf(resourcePath)+ resourcePath.length());
+				
+			}
+		}
+				
 		return null;
 	}
 
