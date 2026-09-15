@@ -14,7 +14,7 @@ import com3011.assignment1.service.VoskService;
 public class AudioController {
 
 	@PostMapping("/api/v1/transcribe")
-	public String transcribe(@RequestParam("audio") MultipartFile audioFile) throws IOException {
+	public String transcribe(@RequestParam("audio") MultipartFile audioFile) throws IOException, InterruptedException {
 		String transcribedText = voskService.transcribe(audioFile.getBytes());
 		
 		return transcribedText;

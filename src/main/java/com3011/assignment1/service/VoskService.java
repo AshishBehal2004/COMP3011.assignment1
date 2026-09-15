@@ -22,21 +22,22 @@ public class VoskService {
 		model = new Model(modelPath);
 	}
 	
-	public String transcribe(byte[] audioBytes) throws IOException  {
+	public String transcribe(byte[] audioBytes) throws IOException, InterruptedException  {
 		
 		File tempInput = File.createTempFile("audio", ".webm");
 		Files.write(tempInput.toPath(), audioBytes);
 		File tempOutput = File.createTempFile("audio",".wav");
 		
-		//To Do: ffmpeg conversion
+		ProcessBuilder processBuilder = new ProcessBuilder("ffmpeg", "-i", tempInput.getAbsolutePath(), "-ar", "16000", "-ac", "1", tempOutput.getAbsolutePath()); //conversion step
 		
-		ProcessBuilder processBuilder = new ProcessBuilder("ffmpeg", "-i", tempInput.getAbsolutePath(), "-ar", "16000", "-ac", "1", tempOutput.getAbsolutePath());
+		Process process = processBuilder.start(); // begin converting
+		process.waitFor(); // wait till the conversion finishes
 		
-		
+		byte[] convertedBytes = Files.readAllBytes(tempOutput.toPath()); //read the file bytes into memory, so it can be used
 		
 		Recognizer recognizer = new Recognizer(model, 16000);
 		
-		recognizer.acceptWaveForm(audioBytes, audioBytes.length);
+		recognizer.acceptWaveForm(convertedBytes, convertedBytes.length);
 		
 		String finalResult = recognizer.getFinalResult();
 		ObjectMapper mapper = new ObjectMapper();
