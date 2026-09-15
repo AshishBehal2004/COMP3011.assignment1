@@ -26,10 +26,13 @@ public class VoskService {
 		
 		File tempInput = File.createTempFile("audio", ".webm");
 		Files.write(tempInput.toPath(), audioBytes);
+		File tempOutput = File.createTempFile("audio",".wav");
 		
 		//To Do: ffmpeg conversion
 		
-		File tempOutput = File.createTempFile("audio",".wav");
+		ProcessBuilder processBuilder = new ProcessBuilder("ffmpeg", "-i", tempInput.getAbsolutePath(), "-ar", "16000", "-ac", "1", tempOutput.getAbsolutePath());
+		
+		
 		
 		Recognizer recognizer = new Recognizer(model, 16000);
 		
