@@ -3,6 +3,7 @@ package com3011.assignment1.service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,19 @@ public class VoskService {
 	private final Model model; 
 
 	public VoskService(@Value("${vosk.model.path}") String modelPath) throws IOException  {
+		String extractedPath = extractModelToTemp(modelPath);
 		model = new Model(modelPath);
 	}
 	
+	private String extractModelToTemp(String resourcePath) throws IOException{
+		
+		Path tempDir = Files.createTempDirectory("vosk-model");
+		
+		
+//		Resource[] resources = resolver.
+		return null;
+	}
+
 	public String transcribe(byte[] audioBytes) throws IOException, InterruptedException  {
 		
 		File tempInput = File.createTempFile("audio", ".webm");
@@ -50,6 +61,7 @@ public class VoskService {
 		String transcript = result.get("text").asString();
 		
 		return transcript;
+	
 	}
 	
 }
