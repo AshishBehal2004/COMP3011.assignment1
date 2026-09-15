@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -25,10 +25,22 @@ public class VoskService {
 	
 	private final Model model; 
 	
+	private final AtomicLong totalInputSamples = new AtomicLong(0);
+	private final AtomicLong totalOutputWords = new AtomicLong(0);
+	
 	public VoskService(@Value("${vosk.model.path}") String modelPath ) throws IOException  {
 		String extractedPath = extractModelToTemp(modelPath);
 		model = new Model(extractedPath);
 		
+	}
+	
+	public long getTotalInputSamples() {
+		return totalInputSamples.get();
+	}
+	
+	
+	public long getTotalOutputWords() {
+		return totalOutputWords.get();
 	}
 	
 	private String extractModelToTemp(String resourcePath) throws IOException{
@@ -64,14 +76,22 @@ public class VoskService {
 		
 		recognizer.acceptWaveForm(audioBytes, audioBytes.length);
 		
+		totalInputSamples.addAndGet(audioBytes.length / 2);
+		
 		String finalResult = recognizer.getFinalResult();
 		ObjectMapper mapper = new ObjectMapper();
 		
 		JsonNode result = mapper.readTree(finalResult); //basically telling java that its in a JSON format
 		String transcript = result.get("text").asString();
 		
+		if (!transcript.isBlank()) {
+			totalOutputWords.addAndGet(transcript.trim().split("\\s+").length);
+			
+		}
 		return transcript;
 	
 	}
+
+	
 	
 }

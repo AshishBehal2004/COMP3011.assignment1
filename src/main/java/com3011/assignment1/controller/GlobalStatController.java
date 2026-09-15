@@ -5,16 +5,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com3011.assignment1.model.GlobalStatResponse;
+import com3011.assignment1.service.VoskService;
 
 @RestController
 @RequestMapping("/api/v1/global")
 public class GlobalStatController {
 	
+	private final VoskService voskService;
+	
+	public GlobalStatController(VoskService currentvoskService) {
+		this.voskService = currentvoskService;
+		
+	}
+	
 	@GetMapping("/stats")
-	public GlobalStatResponse getTime() {
+	public GlobalStatResponse getStats() {
 		
-		
-		return new GlobalStatResponse(0L, 0L);
+		return new GlobalStatResponse(voskService.getTotalInputSamples(), voskService.getTotalOutputWords());
 	}
 	
 }
