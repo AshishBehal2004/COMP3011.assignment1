@@ -28,9 +28,13 @@ public class VoskService {
 		Files.write(tempInput.toPath(), audioBytes);
 		File tempOutput = File.createTempFile("audio",".wav");
 		
-		ProcessBuilder processBuilder = new ProcessBuilder("ffmpeg", "-i", tempInput.getAbsolutePath(), "-ar", "16000", "-ac", "1", tempOutput.getAbsolutePath()); //conversion step
+		ProcessBuilder processBuilder = new ProcessBuilder("ffmpeg", "-y", "-i", tempInput.getAbsolutePath(), "-ar", "16000", "-ac", "1", tempOutput.getAbsolutePath()); //conversion step
+		
+		processBuilder.inheritIO();
 		
 		Process process = processBuilder.start(); // begin converting
+		
+		
 		process.waitFor(); // wait till the conversion finishes
 		
 		byte[] convertedBytes = Files.readAllBytes(tempOutput.toPath()); //read the file bytes into memory, so it can be used
