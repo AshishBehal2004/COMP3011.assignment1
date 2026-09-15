@@ -60,14 +60,9 @@ public class VoskService {
 
 	public String transcribe(byte[] audioBytes) throws IOException  {
 		
-		
-
-		
-		byte[] convertedBytes = java.util.Arrays.copyOfRange(audioBytes, 44, audioBytes.length);
-		
 		Recognizer recognizer = new Recognizer(model, 16000);
 		
-		recognizer.acceptWaveForm(convertedBytes, convertedBytes.length);
+		recognizer.acceptWaveForm(audioBytes, audioBytes.length);
 		
 		String finalResult = recognizer.getFinalResult();
 		ObjectMapper mapper = new ObjectMapper();
