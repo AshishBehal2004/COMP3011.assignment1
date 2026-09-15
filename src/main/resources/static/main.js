@@ -30,6 +30,18 @@ startButton.addEventListener("click", async () =>{
 		processorNode.disconnect();
 		sourceNode.disconnect();
 		stream.getTracks().forEach(track => track.stop());
+		
+		const merged = mergeChunks(recordedChunks);
+		const downsampled = downSampleTo16k(merged, audioContext.sampleRate, 16000);
+		
+		const pcmBlob = encodePcm16(downsampled);
+		const formData = new FormData();
+		
+		formData.append("audio", pcmBlob, "recording.pcm");
+		
+		fetch("/api/v1/transcribe", { method: "POST", body: formData })
+			.then(response => response.text())
+			.then(text =>  console.log(text));	
 })
 
 function mergeChunks(chunks){
@@ -57,4 +69,17 @@ function downSampleTo16k(samples, inputRate, outputRate){
 		result[i] = samples[Math.round(i*ratio)];
 	}
 	return result;
+}
+
+function encodePcm16(samples){
+	
+	const buffer = new ArrayBuffer(samples.length * 2);
+  	const view = new DataView(buffer);
+
+  	let offset = 0;
+  	for (let i = 0; i < samples.length; i++, offset += 2) {
+      	const clamped = Math.max(-1, Math.min(1, samples[i]));
+      	view.setInt16(offset, clamped < 0 ? clamped * 0x8000 : clamped * 0x7fff, true);
+  	}
+	return new Blob([view], { type: "application/octet-stream" });
 }
