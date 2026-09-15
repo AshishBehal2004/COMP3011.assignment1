@@ -1,6 +1,7 @@
 const startButton = document.getElementById("start-button");
 const stopButton = document.getElementById("stop-button");
 const audioPlayback = document.getElementById("audio-playback");
+const transcriptOutput = document.getElementById("transcript-output");
 
 let stream ;
 let audioContext;
@@ -33,7 +34,6 @@ startButton.addEventListener("click", async () =>{
 		
 		const merged = mergeChunks(recordedChunks);
 		const downsampled = downSampleTo16k(merged, audioContext.sampleRate, 16000);
-		
 		const pcmBlob = encodePcm16(downsampled);
 		const formData = new FormData();
 		
@@ -41,7 +41,7 @@ startButton.addEventListener("click", async () =>{
 		
 		fetch("/api/v1/transcribe", { method: "POST", body: formData })
 			.then(response => response.text())
-			.then(text =>  console.log(text));	
+			.then(text => transcriptOutput.textContent = text);	
 })
 
 function mergeChunks(chunks){
