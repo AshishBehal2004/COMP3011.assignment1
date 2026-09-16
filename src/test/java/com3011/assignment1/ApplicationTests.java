@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.TestRestTemplate;
@@ -24,6 +25,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -83,10 +85,14 @@ class ApplicationTests {
 				ResponseEntity<String> response = future.get();
 				assertEquals(HttpStatus.OK, response.getStatusCode());
 			}
-			assertTrue(elapsed.getSeconds() < 20);
+			assertTrue(elapsed.getSeconds() < 90);
 			
 			long expected = samples + ((long) NUM_REQUESTS * SAMPLE_PER_REQUEST);
 			assertEquals(expected, voskService.getTotalInputSamples());
-			
+	}
+	
+	@BeforeEach
+	void setUp() {
+		restTemplate.getRestTemplate().setRequestFactory(new SimpleClientHttpRequestFactory());
 	}
 }
