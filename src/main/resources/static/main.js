@@ -1,6 +1,6 @@
 const startButton = document.getElementById("start-button");
 const stopButton = document.getElementById("stop-button");
-const audioPlayback = document.getElementById("audio-playback");
+
 const transcriptOutput = document.getElementById("transcript-output");
 const recordingStatus = document.getElementById("recording-status");
 
@@ -91,6 +91,8 @@ function downSampleTo16k(samples, inputRate, outputRate){
 	return result;
 }
 
+// Sending raw PCM with no WAV header as its fine since both the browser and the
+// server agree on the format already
 function encodePcm16(samples){
 	
 	const buffer = new ArrayBuffer(samples.length * 2);

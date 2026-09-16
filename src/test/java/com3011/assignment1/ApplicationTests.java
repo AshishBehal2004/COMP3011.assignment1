@@ -61,6 +61,8 @@ class ApplicationTests {
 	void contextLoads() {
 	}
 
+	// Java's default async HttpClient couldn't open 250 connections at once reliably,
+	// so I switched to a simple blocking client just for this test.
 	@Test
 	void audioTest() throws Exception{
 		byte[] audioArr = new byte[SAMPLE_PER_REQUEST * 2];

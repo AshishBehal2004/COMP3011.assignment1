@@ -24,7 +24,8 @@ import tools.jackson.databind.ObjectMapper;
 public class VoskService {
 	
 	private final Model model; 
-	
+	// AtomicLong because many requests can hit this at the same time; a plain long
+	// would silently drop updates under concurrent load.
 	private final AtomicLong totalInputSamples = new AtomicLong(0);
 	private final AtomicLong totalOutputWords = new AtomicLong(0);
 	
@@ -49,7 +50,6 @@ public class VoskService {
 		
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		Resource[] resources = resolver.getResources("classpath:"+resourcePath+"/**");
-		System.out.println("Found resources: " + resources.length);
 		
 		for(Resource resource: resources) {
 			
@@ -67,9 +67,9 @@ public class VoskService {
 			}
 		}
 		return tempDir.toString();
-//		return null;
 	}
 
+//New Recognizer each call as Vosk models aren't thread-safe to share directly.
 	public String transcribe(byte[] audioBytes) throws IOException  {
 		
 		Recognizer recognizer = new Recognizer(model, 16000);
@@ -86,7 +86,6 @@ public class VoskService {
 		
 		if (!transcript.isBlank()) {
 			totalOutputWords.addAndGet(transcript.trim().split("\\s+").length);
-			
 		}
 		return transcript;
 	
