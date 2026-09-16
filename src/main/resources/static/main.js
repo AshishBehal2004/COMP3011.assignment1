@@ -2,6 +2,7 @@ const startButton = document.getElementById("start-button");
 const stopButton = document.getElementById("stop-button");
 const audioPlayback = document.getElementById("audio-playback");
 const transcriptOutput = document.getElementById("transcript-output");
+const recordingStatus = document.getElementById("recording-status");
 
 let stream ;
 let audioContext;
@@ -10,7 +11,9 @@ let processorNode;
 let recordedChunks = [];
 
 startButton.addEventListener("click", async () =>{
-	stream = await navigator.mediaDevices.getUserMedia({audio: true})
+	
+	recordingStatus.textContent = "Recording...";
+	stream = await navigator.mediaDevices.getUserMedia({audio: true});
 	
 	audioContext = new AudioContext();
 	sourceNode = audioContext.createMediaStreamSource(stream);
@@ -28,6 +31,7 @@ startButton.addEventListener("click", async () =>{
 })
 
 	stopButton.addEventListener("click", () => {
+		recordingStatus.textContent = "Not Recording..." ;
 		processorNode.disconnect();
 		sourceNode.disconnect();
 		stream.getTracks().forEach(track => track.stop());

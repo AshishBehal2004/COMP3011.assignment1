@@ -2,14 +2,16 @@
 <html>
 <head>
   <title>Microphone Capture Demo</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <button id="start-button">Start Capture</button>
-  <button id="stop-button">Stop Capture</button>
+	<p id="recording-status">Not recording</p>
+	<button id="start-button">Start Capture</button>
+	<button id="stop-button">Stop Capture</button>
   
-  <audio id="audio-playback" controls >
-  </audio>
-	
+	<audio id="audio-playback" controls >
+	</audio>
+		
 	<p id="transcript-output"></p>
 
   <script src="main.js"></script>
