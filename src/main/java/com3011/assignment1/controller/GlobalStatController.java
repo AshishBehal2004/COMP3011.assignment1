@@ -14,8 +14,7 @@ public class GlobalStatController {
 	private final VoskService voskService;
 	
 	public GlobalStatController(VoskService currentvoskService) {
-		this.voskService = currentvoskService;
-		
+		this.voskService = currentvoskService;	
 	}
 	
 	@GetMapping("/stats")
