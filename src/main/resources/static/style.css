@@ -18,3 +18,40 @@ h1 {
 	margin-bottom: 16px;
 }
 
+button {
+	font-size: 1rem;
+	padding: 10px 20px;
+	margin: 0 8px 20px 8px;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	color: #fff;
+	background-color: #3b6dd6;
+}
+
+button:hover {
+	background-color: #2f57ac;
+}
+
+#stop-button {
+	background-color: #d64545;
+}
+
+#stop-button:hover {
+	background-color: #ac2f2f;
+}
+
+audio {
+	display: block;
+	margin: 20px auto;
+	width: 100%;
+}
+
+#transcript-output {
+	margin-top: 20px;
+	padding: 12px;
+	background-color: #f2f2f2;
+	border-radius: 6px;
+	min-height: 1.2em;
+	text-align: left;
+}
