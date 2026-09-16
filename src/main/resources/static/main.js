@@ -12,25 +12,32 @@ let recordedChunks = [];
 
 startButton.addEventListener("click", async () =>{
 	
-	recordingStatus.textContent = "Recording...";
-	stream = await navigator.mediaDevices.getUserMedia({audio: true});
-	
-	audioContext = new AudioContext();
-	sourceNode = audioContext.createMediaStreamSource(stream);
-	
-	processorNode = audioContext.createScriptProcessor(4096, 1, 1);
-	
-	processorNode.onaudioprocess = (event) => {
-		const inputData = event.inputBuffer.getChannelData(0);
-		recordedChunks.push(new Float32Array(inputData));
+	try{
+		stream = await navigator.mediaDevices.getUserMedia({audio: true});
+			
+			recordingStatus.textContent = "Recording...";
+			audioContext = new AudioContext();
+			sourceNode = audioContext.createMediaStreamSource(stream);
+			
+			processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+			
+			processorNode.onaudioprocess = (event) => {
+				const inputData = event.inputBuffer.getChannelData(0);
+				recordedChunks.push(new Float32Array(inputData));
+			}
+			
+			sourceNode.connect(processorNode);
+			processorNode.connect(audioContext.destination);
+	}
+	catch(error){
+		recordingStatus.textContent = "Microphone access denied: " + error.message;
 	}
 	
-	sourceNode.connect(processorNode);
-	processorNode.connect(audioContext.destination);
 
 })
 
-	stopButton.addEventListener("click", () => {
+	stopButton.addEventListener("click", async () => {
+		
 		recordingStatus.textContent = "Not Recording..." ;
 		processorNode.disconnect();
 		sourceNode.disconnect();
@@ -43,9 +50,18 @@ startButton.addEventListener("click", async () =>{
 		
 		formData.append("audio", pcmBlob, "recording.pcm");
 		
-		fetch("/api/v1/transcribe", { method: "POST", body: formData })
-			.then(response => response.text())
-			.then(text => transcriptOutput.textContent = text);	
+		try {
+			const response = await fetch("/api/v1/transcribe", { method: "POST", body: formData });
+			if (!response.ok){
+				throw new Error("Server returned status " + response.status);
+			}
+			const text = await response.text();
+			transcriptOutput.textContent = text;
+		}
+		catch(error) {
+			transcriptOutput.textContent = "Transcription failed: " + error.message;
+		}
+		
 })
 
 function mergeChunks(chunks){
